@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14.0</LangVersion>
+    <UserSecretsId>894b764a-7457-4f2a-874d-0d7d7ee41046</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\WorkCompanion.Common.Configuration\WorkCompanion.Common.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\Common\WorkCompanion.Common.Logging\WorkCompanion.Common.Logging.csproj" />
+    <ProjectReference Include="..\WorkCompanion.Identity.Application\WorkCompanion.Identity.Application.csproj" />
+    <ProjectReference Include="..\WorkCompanion.Identity.Infrastructure\WorkCompanion.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\WorkCompanion.Identity.Infrastructure.Migrations.Sqlite\WorkCompanion.Identity.Infrastructure.Migrations.Sqlite.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,101 @@
+<Project>
+  <!-- Common build targets for all projects in the solution -->
+
+  <!-- ============================================================ -->
+  <!-- CUSTOM BUILD TASKS AND TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Source Link is optional and only imported if the package is available -->
+  <!-- To use SourceLink, add Microsoft.SourceLink.GitHub NuGet package to your project -->
+
+  <!-- ============================================================ -->
+  <!-- PRE-BUILD VALIDATION -->
+  <!-- ============================================================ -->
+
+  <!-- Validate that the project has required metadata -->
+  <Target Name="ValidateProjectMetadata" BeforeTargets="Build">
+    <Warning Text="Project $(MSBuildProjectName) is missing Authors metadata. Add Authors property to Directory.Build.props or project file."
+             Condition="'$(Authors)' == ''" />
+    <Warning Text="Project $(MSBuildProjectName) is missing Product metadata. Add Product property to Directory.Build.props or project file."
+             Condition="'$(Product)' == ''" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- DOCUMENTATION GENERATION TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Ensure documentation output directory exists -->
+  <Target Name="EnsureDocumentationDirectory" BeforeTargets="CoreCompile"
+          Condition="'$(GenerateDocumentationFile)' == 'true'">
+    <CreateItem Include="bin\$(Configuration)\$(TargetFramework)">
+      <Output TaskParameter="Include" ItemName="DocOutputDir" />
+    </CreateItem>
+    <MakeDir Directories="%(DocOutputDir.Identity)" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- CLEAN TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Clean generated documentation files -->
+  <Target Name="CleanDocumentation" BeforeTargets="Clean"
+          Condition="'$(GenerateDocumentationFile)' == 'true'">
+    <Delete Files="bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- PACKAGE-SPECIFIC TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Copy license file for package generation -->
+  <Target Name="IncludeLicenseInPackage"
+          Condition="'$(GenerateLicenseFile)' == 'true' AND '$(GeneratePackageOnBuild)' == 'true'"
+          BeforeTargets="GeneratePackageOnBuild">
+    <Message Text="License file will be included in package: $(LicenseFilePath)" Importance="normal" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- DETERMINISTIC BUILD SUPPORT -->
+  <!-- ============================================================ -->
+
+  <!-- Ensure CI builds are completely deterministic -->
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true' OR '$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- ============================================================ -->
+  <!-- CODE ANALYSIS TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Collection of NuGet-based analyzers that should be included in all projects -->
+  <ItemGroup Condition="'$(EnableNETAnalyzers)' == 'true'">
+    <!-- Roslyn analyzers are included by default in recent .NET SDKs -->
+    <CompilerVisibleProperty Include="AnalysisLevel" />
+    <CompilerVisibleProperty Include="EnforceCodeStyleInBuild" />
+  </ItemGroup>
+
+  <!-- ============================================================ -->
+  <!-- TEST PROJECT TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Additional configuration for test projects -->
+  <Target Name="ConfigureTestProject"
+          Condition="'$(IsTestProject)' == 'true'"
+          BeforeTargets="Build">
+    <Message Text="Building test project: $(MSBuildProjectName)" Importance="high" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- VERSION INFORMATION TARGETS -->
+  <!-- ============================================================ -->
+
+  <!-- Generate and stamp version information in assemblies -->
+  <Target Name="StampAssemblyVersion" BeforeTargets="CoreCompile"
+          Condition="'$(GenerateAssemblyVersionAttribute)' != 'false'">
+    <PropertyGroup>
+      <AssemblyVersionValue Condition="'$(AssemblyVersionValue)' == ''">$(VersionPrefix.Split('.')[0]).0.0.0</AssemblyVersionValue>
+    </PropertyGroup>
+    <Message Text="Assembly Version: $(AssemblyVersionValue)" Importance="low" />
+  </Target>
+
+</Project>
